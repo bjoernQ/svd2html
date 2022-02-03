@@ -2,6 +2,8 @@
 
 This is a simple script written in Rust language to create a single HTML file from an SVD file.
 
+![How it looks like](https://raw.githubusercontent.com/bjoernQ/svd2html/main/docs/example.png "How it looks like")
+
 It's really simple and makes some assumptions (e.g. registers are 32 bit wide, the target is little endian etc.)
 
 I created this for myself to make it easier to visually compare and inspect the contents of SVD files. But maybe it's useful to you.
