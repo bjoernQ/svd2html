@@ -1,0 +1,31 @@
+{% extends "_layout.html" %}
+
+{% block title %}{{ chip|upper }} Peripherals{% endblock %}
+
+
+{% block content %}
+
+<h1>{{ chip|upper }} Peripherals</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Peripheral</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for p in peripherals %}
+    <tr>
+        <td>
+          <a href="{{ p.name }}.html">{{ p.name }}</a>
+        </td>
+        <td>
+          <p>{{ p.description }}</p>
+        </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "_layout.html" %}
+
+{% block title %}{{ chip|upper }} - {{ peripheral|upper }} Peripheral{% endblock %}
+
+
+{% block content %}
+
+<h1>{{ chip|upper }} - {{ peripheral|upper }} Peripheral</h1>
+
+{% if description != none %}
+<strong>{{ description }}</strong>
+{% endif %}
+
+{% if interrupts|length > 0 %}
+<h2>Interrupts</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interrupt</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for interrupt in interrupts %}
+    <tr>
+      <td><strong>{{ interrupt.name }}</strong></td>
+      <td>{{ interrupt.value }}</td>
+      <td>{{ interrupt.description }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if registers|length > 0 %}
+<h2>Registers</h2>
+
+<p>Expand a register below to view its fields.</p>
+
+{% for register in registers %}
+<details>
+  <summary>
+    <h3>{{ register.name }}</h3>
+    (Offset: {{ register.offset }}, Absolute: {{ register.absolute }})
+  </summary>
+
+  {% if register.description != none %}
+  <strong>{{ register.description }}</strong>
+  {% endif %}
+
+  {% if register.fields|length > 0 %}
+  <table class="peripheral">
+    <thead>
+      <tr>
+      {% for name in register.fields.names %}
+        <th>{{ name }}</th>
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+      {% for field in register.fields.spans %}
+        <td colspan="{{ field.span }}">{{ field.text }}</td>
+      {% endfor %}
+      </tr>
+      <tr>
+      {% for i in range(32)|reverse %}
+        <td>{{ i }}</td>
+      {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Field Descriptions</h3>
+  {% for field in register.fields.descriptions %}
+  <p>
+    <strong>{{ field.name }}</strong>
+    <em>({{ field.access }})</em>
+    {{ field.description }}
+  </p>
+  {% endfor %}
+  {% endif %}
+</details>
+{% endfor %}
+{% endif %}
+
+{% endblock %}
