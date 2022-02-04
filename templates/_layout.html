@@ -17,6 +17,17 @@
         padding: 0 2rem;
       }
 
+      header {
+        margin-bottom: 2rem;
+      }
+      header a {
+        color: white;
+        font-size: 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
       h2 {
         margin-top: 2rem;
       }
@@ -68,6 +79,10 @@
     </style>
   </head>
   <body>
+    <header>
+      <a href="./index.html">{{ chip|upper }}</a>
+    </header>
+
     <main role="main">{% block content %}{% endblock %}</main>
   </body>
 </html>

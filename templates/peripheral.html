@@ -1,11 +1,22 @@
-{% extends "_layout.html" %} {% block title %}{{ chip|upper }} - {{
-peripheral|upper }} Peripheral{% endblock %} {% block content %}
+{% extends "_layout.html" %}
 
-<h1>{{ chip|upper }} - {{ peripheral|upper }} Peripheral</h1>
+{% block title %}{{ chip|upper }} - {{ peripheral|upper }} Peripheral{% endblock %}
+
+
+{% block content %}
+
+<h1>{{ peripheral|upper }} Peripheral</h1>
 
 {% if description != none %}
-<strong>{{ description }}</strong>
-{% endif %} {% if interrupts|length > 0 %}
+<p>
+  <strong>{{ description }}</strong>
+</p>
+{% endif %}
+<p>
+  <strong>Base Address: {{ address }}</strong>
+</p>
+
+{% if interrupts|length > 0 %}
 <h2>Interrupts</h2>
 
 <table>
@@ -26,7 +37,9 @@ peripheral|upper }} Peripheral{% endblock %} {% block content %}
     {% endfor %}
   </tbody>
 </table>
-{% endif %} {% if registers|length > 0 %}
+{% endif %}
+
+{% if registers|length > 0 %}
 <h2>Registers</h2>
 
 <p>Expand a register below to view its fields.</p>
@@ -40,7 +53,9 @@ peripheral|upper }} Peripheral{% endblock %} {% block content %}
 
   {% if register.description != none %}
   <strong>{{ register.description }}</strong>
-  {% endif %} {% if register.fields|length > 0 %}
+  {% endif %}
+
+  {% if register.fields|length > 0 %}
   <table class="peripheral">
     <thead>
       <tr>
@@ -85,4 +100,7 @@ peripheral|upper }} Peripheral{% endblock %} {% block content %}
   </table>
   {% endif %}
 </details>
-{% endfor %} {% endif %} {% endblock %}
+{% endfor %}
+{% endif %}
+
+{% endblock %}

@@ -118,6 +118,7 @@ fn render_peripheral(chip: &String, peripheral: &PeripheralInfo) -> Result<Strin
     let ctx = context! {
         chip        => chip,
         peripheral  => peripheral.name.clone(),
+        address     => format!("0x{:08x}", peripheral.base_address),
         description => if let Some(desc) = &peripheral.description {
             desc.to_owned()
         } else {
