@@ -54,8 +54,8 @@
   <table class="peripheral">
     <thead>
       <tr>
-      {% for name in register.fields.names %}
-        <th>{{ name }}</th>
+      {% for field in register.fields.spans %}
+        <th colspan="{{ field.span }}">{{ field.name }}</th>
       {% endfor %}
       </tr>
     </thead>
@@ -74,13 +74,25 @@
   </table>
 
   <h3>Field Descriptions</h3>
-  {% for field in register.fields.descriptions %}
-  <p>
-    <strong>{{ field.name }}</strong>
-    <em>({{ field.access }})</em>
-    {{ field.description }}
-  </p>
-  {% endfor %}
+
+  <table class="fields">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Access</th>
+        <th colspan="2">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for field in register.fields.descriptions %}
+    <tr>
+      <td><strong>{{ field.name }}</strong></td>
+      <td>{{ field.access }}</td>
+      <td colspan="2">{{ field.description }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
   {% endif %}
 </details>
 {% endfor %}

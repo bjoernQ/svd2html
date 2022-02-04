@@ -1,5 +1,4 @@
 use std::{
-    collections::HashMap,
     fs::{self, File},
     io::Write,
     path::PathBuf,
@@ -174,8 +173,7 @@ fn registers(peripheral: &PeripheralInfo) -> Vec<Value> {
                 offset      => format!("0x{:04x}", ri.address_offset),
                 absolute    => format!("0x{:08x}", absolute),
                 fields      => context! {
-                    names        => field_names(register),
-                    spans        => field_spans(register),
+                    spans        => fields(register),
                     descriptions => field_descriptions(register),
                 },
             }
@@ -183,55 +181,47 @@ fn registers(peripheral: &PeripheralInfo) -> Vec<Value> {
         .collect::<Vec<_>>()
 }
 
-fn field_names(register: &MaybeArray<RegisterInfo>) -> Vec<String> {
-    let fields = register
-        .fields()
-        .map(|f| (f.bit_offset() + f.bit_width() / 2, f))
-        .collect::<HashMap<_, _>>();
-
-    (0..32)
-        .rev()
-        .map(|bit| {
-            if let Some(field) = fields.get(&bit) {
-                field.name.to_owned()
-            } else {
-                String::new()
-            }
-        })
-        .collect::<Vec<_>>()
-}
-
-fn field_spans(register: &MaybeArray<RegisterInfo>) -> Vec<Value> {
+fn fields(register: &MaybeArray<RegisterInfo>) -> Vec<Value> {
     let mut fields = register
         .fields()
-        .map(|f| (f.bit_offset() + f.bit_width() - 1, f.bit_offset()))
+        .map(|f| {
+            let from = f.bit_offset() + f.bit_width() - 1;
+            let to = f.bit_offset();
+
+            (Some(f), from, to)
+        })
         .rev()
-        .collect::<Vec<(_, _)>>();
+        .collect::<Vec<(_, _, _)>>();
 
     let mut at = 0;
     for i in (0..fields.len()).rev() {
-        let (from, to) = fields[i];
+        let (f, from, to) = fields[i];
 
         if to > at {
-            fields.insert(i + 1, (at + (to - at) - 1, at));
+            fields.insert(i + 1, (f, at + (to - at) - 1, at));
         }
 
         at = from + 1;
     }
 
     if fields.len() > 0 {
-        let (f, _) = fields[0];
-        if f < 31 {
-            fields.insert(0, (31, f + 1));
+        let (f, from, _) = fields[0];
+        if from < 31 {
+            fields.insert(0, (f, 31, from + 1));
         }
     } else {
-        fields.push((31, 0));
+        fields.push((None, 31, 0));
     }
 
     fields
         .iter()
-        .map(|(from, to)| {
+        .map(|(f, from, to)| {
             context! {
+                name => if let Some(field) = f {
+                    field.name.to_owned()
+                } else {
+                    String::new() // TODO: should this be RESERVED in any case?
+                },
                 span => from - to + 1,
                 text => if from == to {
                     format!("{}", from)

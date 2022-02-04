@@ -17,20 +17,36 @@
         padding: 0 2rem;
       }
 
+      h2 {
+        margin-top: 2rem;
+      }
+
       td {
         vertical-align: middle;
+      }
+
+      details h3 {
+        margin-top: 3rem;
       }
 
       .peripheral {
         margin: 1.5rem 0 !important;
       }
       .peripheral th {
+        padding-bottom: 0.5rem;
         text-align: end;
+        vertical-align: middle;
         writing-mode: vertical-lr;
       }
       .peripheral td {
         border: 1px solid white;
         text-align: center;
+      }
+      .peripheral tbody tr:first-child {
+        font-size: 1.125rem;
+      }
+      .peripheral tbody tr:last-child {
+        font-size: 0.75rem;
       }
 
       summary {
@@ -40,6 +56,14 @@
       summary h3 {
         display: inline-block;
         margin: 0 0.25rem;
+      }
+
+      .fields {
+        margin-bottom: 1rem !important;
+      }
+      .fields th:nth-child(2),
+      .fields td:nth-child(2) {
+        text-align: center;
       }
     </style>
   </head>
