@@ -8,7 +8,7 @@ use anyhow::Result;
 use clap::Parser;
 use lazy_static::lazy_static;
 use minijinja::{context, value::Value, Environment, Source, State};
-use svd_parser::svd::{Access, MaybeArray, PeripheralInfo, RegisterInfo};
+use svd_parser::svd::{Access, FieldInfo, MaybeArray, PeripheralInfo, RegisterInfo};
 
 lazy_static! {
     static ref ENV: Environment<'static> = create_environment();
@@ -170,18 +170,39 @@ fn registers(peripheral: &PeripheralInfo) -> Vec<Value> {
                 } else {
                     String::new()
                 },
-                offset      => format!("0x{:04x}", ri.address_offset),
-                absolute    => format!("0x{:08x}", absolute),
-                fields      => context! {
-                    spans        => fields(register),
-                    descriptions => field_descriptions(register),
-                },
+                offset   => format!("0x{:04x}", ri.address_offset),
+                absolute => format!("0x{:08x}", absolute),
+                fields   => fields(register),
             }
         })
         .collect::<Vec<_>>()
 }
 
 fn fields(register: &MaybeArray<RegisterInfo>) -> Vec<Value> {
+    fields_with_spans(register)
+        .iter()
+        .map(|(f, from, to)| {
+            let (name, desc, access) = field_info(f);
+
+            context! {
+                name        => name,
+                description => desc,
+                access      => access,
+
+                span => from - to + 1,
+                text => if from == to {
+                    format!("{}", from)
+                } else {
+                    format!("{} - {}", from, to)
+                },
+            }
+        })
+        .collect::<Vec<_>>()
+}
+
+fn fields_with_spans(
+    register: &MaybeArray<RegisterInfo>,
+) -> Vec<(Option<&MaybeArray<FieldInfo>>, u32, u32)> {
     let mut fields = register
         .fields()
         .map(|f| {
@@ -214,52 +235,34 @@ fn fields(register: &MaybeArray<RegisterInfo>) -> Vec<Value> {
     }
 
     fields
-        .iter()
-        .map(|(f, from, to)| {
-            context! {
-                name => if let Some(field) = f {
-                    field.name.to_owned()
-                } else {
-                    String::new() // TODO: should this be RESERVED in any case?
-                },
-                span => from - to + 1,
-                text => if from == to {
-                    format!("{}", from)
-                } else {
-                    format!("{} - {}", from, to)
-                },
-            }
-        })
-        .collect::<Vec<_>>()
 }
 
-fn field_descriptions(register: &MaybeArray<RegisterInfo>) -> Vec<Value> {
-    register
-        .fields()
-        .map(|f| {
-            let desc = match &f.description {
-                Some(d) => d.to_owned(),
-                None => String::new(),
-            };
+fn field_info(field: &Option<&MaybeArray<FieldInfo>>) -> (String, String, String) {
+    let mut name = String::new();
+    let mut desc = String::new();
+    let mut access = String::from("-");
 
-            let access = match &f.access {
-                Some(access) => match access {
-                    Access::ReadOnly => "R",
-                    Access::ReadWrite => "RW",
-                    Access::ReadWriteOnce => "RWO",
-                    Access::WriteOnce => "WO",
-                    Access::WriteOnly => "W",
-                },
-                None => "-",
-            };
+    if let Some(f) = field {
+        name = f.name.clone();
 
-            context! {
-                name        => f.name.clone(),
-                description => desc,
-                access      => access,
-            }
-        })
-        .collect::<Vec<_>>()
+        if let Some(description) = &f.description {
+            desc = description.to_owned();
+        }
+
+        access = match &f.access {
+            Some(access) => match access {
+                Access::ReadOnly => "R",
+                Access::ReadWrite => "RW",
+                Access::ReadWriteOnce => "RWO",
+                Access::WriteOnce => "WO",
+                Access::WriteOnly => "W",
+            },
+            None => "-",
+        }
+        .to_string();
+    }
+
+    (name, desc, access)
 }
 
 fn write_html(source: &String, path: &PathBuf) -> Result<()> {

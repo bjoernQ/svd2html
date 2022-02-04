@@ -1,17 +1,11 @@
-{% extends "_layout.html" %}
-
-{% block title %}{{ chip|upper }} - {{ peripheral|upper }} Peripheral{% endblock %}
-
-
-{% block content %}
+{% extends "_layout.html" %} {% block title %}{{ chip|upper }} - {{
+peripheral|upper }} Peripheral{% endblock %} {% block content %}
 
 <h1>{{ chip|upper }} - {{ peripheral|upper }} Peripheral</h1>
 
 {% if description != none %}
 <strong>{{ description }}</strong>
-{% endif %}
-
-{% if interrupts|length > 0 %}
+{% endif %} {% if interrupts|length > 0 %}
 <h2>Interrupts</h2>
 
 <table>
@@ -32,9 +26,7 @@
     {% endfor %}
   </tbody>
 </table>
-{% endif %}
-
-{% if registers|length > 0 %}
+{% endif %} {% if registers|length > 0 %}
 <h2>Registers</h2>
 
 <p>Expand a register below to view its fields.</p>
@@ -48,27 +40,25 @@
 
   {% if register.description != none %}
   <strong>{{ register.description }}</strong>
-  {% endif %}
-
-  {% if register.fields|length > 0 %}
+  {% endif %} {% if register.fields|length > 0 %}
   <table class="peripheral">
     <thead>
       <tr>
-      {% for field in register.fields.spans %}
+        {% for field in register.fields %}
         <th colspan="{{ field.span }}">{{ field.name }}</th>
-      {% endfor %}
+        {% endfor %}
       </tr>
     </thead>
     <tbody>
       <tr>
-      {% for field in register.fields.spans %}
+        {% for field in register.fields %}
         <td colspan="{{ field.span }}">{{ field.text }}</td>
-      {% endfor %}
+        {% endfor %}
       </tr>
       <tr>
-      {% for i in range(32)|reverse %}
+        {% for i in range(32)|reverse %}
         <td>{{ i }}</td>
-      {% endfor %}
+        {% endfor %}
       </tr>
     </tbody>
   </table>
@@ -84,18 +74,15 @@
       </tr>
     </thead>
     <tbody>
-    {% for field in register.fields.descriptions %}
-    <tr>
-      <td><strong>{{ field.name }}</strong></td>
-      <td>{{ field.access }}</td>
-      <td colspan="2">{{ field.description }}</td>
-    </tr>
-    {% endfor %}
+      {% for field in register.fields|reverse %}
+      <tr>
+        <td><strong>{{ field.name }}</strong></td>
+        <td>{{ field.access }}</td>
+        <td colspan="2">{{ field.description }}</td>
+      </tr>
+      {% endfor %}
     </tbody>
   </table>
   {% endif %}
 </details>
-{% endfor %}
-{% endif %}
-
-{% endblock %}
+{% endfor %} {% endif %} {% endblock %}
