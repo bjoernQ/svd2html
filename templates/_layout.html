@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <style>
+      {{ include_file("static/water.dark.min.css")|safe }}
+    </style>
+
+    <style>
+      body {
+        max-width: 1920px;
+        padding: 0 2rem;
+      }
+
+      header {
+        margin-bottom: 2rem;
+      }
+      header a {
+        color: white;
+        font-size: 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+      h2 {
+        margin-top: 2rem;
+      }
+
+      td {
+        vertical-align: middle;
+      }
+
+      details h3 {
+        margin-top: 3rem;
+      }
+
+      .interrupts th:nth-child(2),
+      .interrupts td:nth-child(2) {
+        text-align: center;
+      }
+
+      .peripheral {
+        margin: 1.5rem 0 !important;
+      }
+      .peripheral th {
+        padding-bottom: 0.5rem;
+        text-align: end;
+        vertical-align: middle;
+        writing-mode: vertical-lr;
+      }
+      .peripheral td {
+        text-align: center;
+      }
+      .peripheral tr:not(:last-child) td {
+        border: 1px solid white;
+      }
+      .peripheral tbody tr:first-child {
+        font-size: 1.125rem;
+      }
+      .peripheral tbody tr:last-child {
+        font-size: 0.75rem;
+      }
+
+      summary {
+        align-items: center;
+        display: flex;
+      }
+      summary h3 {
+        display: inline-block;
+        margin: 0 0.25rem;
+      }
+
+      .fields {
+        margin-bottom: 1rem !important;
+      }
+      .fields th:nth-child(2),
+      .fields td:nth-child(2) {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="./index.html">{{ chip|upper }} System View Description</a>
+    </header>
+
+    <main role="main">{% block content %}{% endblock %}</main>
+  </body>
+</html>

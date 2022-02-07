@@ -1,11 +1,11 @@
 [package]
-name = "svd2html"
+name    = "svd2html"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-svd-parser = "0.13.1"
-clap = "3.0.7"
-clap_derive = "3.0.6"
+anyhow      = "1.0.53"
+clap        = { version = "3.0.7",  features = ["derive"] }
+lazy_static = "1.4.0"
+minijinja   = { version = "0.13.0", features = ["source"] }
+svd-parser  = "0.13.1"

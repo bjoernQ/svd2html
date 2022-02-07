@@ -1,0 +1,106 @@
+{% extends "_layout.html" %}
+
+{% block title %}{{ chip|upper }} - {{ peripheral|upper }} Peripheral{% endblock %}
+
+
+{% block content %}
+
+<h1>{{ peripheral|upper }} Peripheral</h1>
+
+{% if description != none %}
+<p>
+  <strong>{{ description }}</strong>
+</p>
+{% endif %}
+<p>
+  <strong>Base Address: {{ address }}</strong>
+</p>
+
+{% if interrupts|length > 0 %}
+<h2>Interrupts</h2>
+
+<table class="interrupts">
+  <thead>
+    <tr>
+      <th>Interrupt</th>
+      <th>Value</th>
+      <th colspan="3">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for interrupt in interrupts %}
+    <tr>
+      <td><strong>{{ interrupt.name }}</strong></td>
+      <td>{{ interrupt.value }}</td>
+      <td colspan="3">{{ interrupt.description }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if registers|length > 0 %}
+<h2>Registers</h2>
+
+<p>Expand a register below to view its fields.</p>
+
+{% for register in registers %}
+<details>
+  <summary>
+    <h3>{{ register.name }}</h3>
+    (Offset: {{ register.offset }}, Absolute: {{ register.absolute }})
+  </summary>
+
+  {% if register.description != none %}
+  <strong>{{ register.description }}</strong>
+  {% endif %}
+
+  {% if register.fields|length > 0 %}
+  <table class="peripheral">
+    <thead>
+      <tr>
+        {% for field in register.fields %}
+        <th colspan="{{ field.span }}">{{ field.name }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% for field in register.fields %}
+        <td colspan="{{ field.span }}">{{ field.text }}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        {% for i in range(32)|reverse %}
+        <td>{{ i }}</td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Field Descriptions</h3>
+
+  <table class="fields">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Access</th>
+        <th colspan="3">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for field in register.fields|reverse %}
+      <tr>
+        <td><strong>{{ field.name }}</strong></td>
+        <td>{{ field.access }}</td>
+        <td colspan="3">{{ field.description }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</details>
+{% endfor %}
+{% endif %}
+
+{% endblock %}
