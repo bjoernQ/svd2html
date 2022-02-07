@@ -1,7 +1,7 @@
 use std::{
     fs::{self, File},
     io::Write,
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use anyhow::Result;
@@ -87,7 +87,7 @@ fn create_environment() -> Environment<'static> {
     env
 }
 
-fn render_index(chip: &String, peripherals: &Vec<&PeripheralInfo>) -> Result<String> {
+fn render_index(chip: &str, peripherals: &[&PeripheralInfo]) -> Result<String> {
     // Iterate through all peripherals, and constructor a Vector of Context
     // containing the name and description for each.
     let peripheral_info = peripherals
@@ -113,17 +113,13 @@ fn render_index(chip: &String, peripherals: &Vec<&PeripheralInfo>) -> Result<Str
     Ok(html)
 }
 
-fn render_peripheral(chip: &String, peripheral: &PeripheralInfo) -> Result<String> {
+fn render_peripheral(chip: &str, peripheral: &PeripheralInfo) -> Result<String> {
     // Build the template context.
     let ctx = context! {
         chip        => chip,
         peripheral  => peripheral.name.clone(),
         address     => format!("0x{:08x}", peripheral.base_address),
-        description => if let Some(desc) = &peripheral.description {
-            desc.to_owned()
-        } else {
-            String::new()
-        },
+        description => peripheral.description.clone().unwrap_or_default(),
         interrupts  => interrupts(peripheral),
         registers   => registers(peripheral),
     };
@@ -143,11 +139,7 @@ fn interrupts(peripheral: &PeripheralInfo) -> Vec<Value> {
             context! {
                 name        => i.name.clone(),
                 value       => i.value.to_string(),
-                description => if let Some(desc) = &i.description {
-                    desc.to_owned()
-                } else {
-                    String::new()
-                }
+                description => i.description.clone().unwrap_or_default()
             }
         })
         .collect::<Vec<_>>()
@@ -157,7 +149,7 @@ fn registers(peripheral: &PeripheralInfo) -> Vec<Value> {
     peripheral
         .registers()
         .map(|register| {
-            let (ri, size) = match register {
+            let (ri, dim) = match register {
                 MaybeArray::Single(ri) => (ri, 0u32),
                 MaybeArray::Array(ri, de) => (ri, de.dim),
             };
@@ -165,15 +157,11 @@ fn registers(peripheral: &PeripheralInfo) -> Vec<Value> {
             let absolute = peripheral.base_address + ri.address_offset as u64;
 
             context! {
-                name        => ri.name.replace("%s", &format!("<0..{size}>")),
-                description => if let Some(desc) = &ri.description {
-                    desc.to_owned()
-                } else {
-                    String::new()
-                },
-                offset   => format!("0x{:04x}", ri.address_offset),
-                absolute => format!("0x{:08x}", absolute),
-                fields   => fields(register),
+                name        => ri.name.replace("%s", &format!("<0..{dim}>")),
+                description => ri.description.clone().unwrap_or_default(),
+                offset      => format!("0x{:04x}", ri.address_offset),
+                absolute    => format!("0x{:08x}", absolute),
+                fields      => fields(register),
             }
         })
         .collect::<Vec<_>>()
@@ -226,7 +214,7 @@ fn fields_with_spans(
         at = from + 1;
     }
 
-    if fields.len() > 0 {
+    if !fields.is_empty() {
         let (f, from, _) = fields[0];
         if from < 31 {
             fields.insert(0, (f, 31, from + 1));
@@ -266,7 +254,7 @@ fn field_info(field: &Option<&MaybeArray<FieldInfo>>) -> (String, String, String
     (name, desc, access)
 }
 
-fn write_html(source: &String, path: &PathBuf) -> Result<()> {
+fn write_html(source: &str, path: &Path) -> Result<()> {
     eprintln!("Writing: {}", path.display());
 
     let mut file = File::create(path)?;

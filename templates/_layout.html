@@ -40,6 +40,11 @@
         margin-top: 3rem;
       }
 
+      .interrupts th:nth-child(2),
+      .interrupts td:nth-child(2) {
+        text-align: center;
+      }
+
       .peripheral {
         margin: 1.5rem 0 !important;
       }
@@ -50,8 +55,10 @@
         writing-mode: vertical-lr;
       }
       .peripheral td {
-        border: 1px solid white;
         text-align: center;
+      }
+      .peripheral tr:not(:last-child) td {
+        border: 1px solid white;
       }
       .peripheral tbody tr:first-child {
         font-size: 1.125rem;
@@ -80,7 +87,7 @@
   </head>
   <body>
     <header>
-      <a href="./index.html">{{ chip|upper }}</a>
+      <a href="./index.html">{{ chip|upper }} System View Description</a>
     </header>
 
     <main role="main">{% block content %}{% endblock %}</main>
