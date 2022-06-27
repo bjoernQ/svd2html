@@ -215,9 +215,9 @@ fn fields_with_spans(
     }
 
     if !fields.is_empty() {
-        let (f, from, _) = fields[0];
+        let (_, from, _) = fields[0];
         if from < 31 {
-            fields.insert(0, (f, 31, from + 1));
+            fields.insert(0, (None, 31, from + 1));
         }
     } else {
         fields.push((None, 31, 0));

@@ -89,7 +89,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for field in register.fields|reverse %}
+      {% for field in register.fields if not field.name == '' | reverse %}
       <tr>
         <td><strong>{{ field.name }}</strong></td>
         <td>{{ field.access }}</td>
