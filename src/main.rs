@@ -171,12 +171,13 @@ fn fields(register: &MaybeArray<RegisterInfo>) -> Vec<Value> {
     fields_with_spans(register)
         .iter()
         .map(|(f, from, to)| {
-            let (name, desc, access) = field_info(f);
+            let (name, desc, access, values) = field_info(f);
 
             context! {
                 name        => name,
                 description => desc,
                 access      => access,
+                values      => values,
 
                 span => from - to + 1,
                 text => if from == to {
@@ -226,10 +227,11 @@ fn fields_with_spans(
     fields
 }
 
-fn field_info(field: &Option<&MaybeArray<FieldInfo>>) -> (String, String, String) {
+fn field_info(field: &Option<&MaybeArray<FieldInfo>>) -> (String, String, String, Vec<String>) {
     let mut name = String::new();
     let mut desc = String::new();
     let mut access = String::from("-");
+    let mut values = Vec::new();
 
     if let Some(f) = field {
         name = f.name.clone();
@@ -249,9 +251,15 @@ fn field_info(field: &Option<&MaybeArray<FieldInfo>>) -> (String, String, String
             None => "-",
         }
         .to_string();
+
+        for ev in f.enumerated_values.iter() {
+            for v in ev.values.iter() {
+                values.push(format!("{:02b}: {}", v.value.unwrap(), v.name));
+            }
+        }
     }
 
-    (name, desc, access)
+    (name, desc, access, values)
 }
 
 fn write_html(source: &str, path: &Path) -> Result<()> {
