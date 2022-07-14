@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow      = "1.0.53"
-clap        = { version = "3.0.7",  features = ["derive"] }
+anyhow      = "1.0.58"
+clap        = { version = "3.2.11",  features = ["derive"] }
 lazy_static = "1.4.0"
-minijinja   = { version = "0.13.0", features = ["source"] }
-svd-parser  = "0.13.1"
+minijinja   = { version = "0.17.0", features = ["source"] }
+svd-parser  = "0.13.4"
