@@ -193,13 +193,19 @@ fn fields(register: &MaybeArray<RegisterInfo>) -> Vec<Value> {
 fn fields_with_spans(
     register: &MaybeArray<RegisterInfo>,
 ) -> Vec<(Option<&MaybeArray<FieldInfo>>, u32, u32)> {
-    let mut fields = register
-        .fields()
+    let mut fields = Vec::new();
+    for field in register.fields() {
+        fields.push(field);
+    }
+    fields.sort_by_key(|f| f.bit_offset());
+
+    let mut fields = fields
+        .iter()
         .map(|f| {
             let from = f.bit_offset() + f.bit_width() - 1;
             let to = f.bit_offset();
 
-            (Some(f), from, to)
+            (Some(*f), from, to)
         })
         .rev()
         .collect::<Vec<(_, _, _)>>();
@@ -207,6 +213,11 @@ fn fields_with_spans(
     let mut at = 0;
     for i in (0..fields.len()).rev() {
         let (f, from, to) = fields[i];
+
+        if to > at {
+            fields.insert(i + 1, (None, to - 1, at));
+            at = to;
+        }
 
         if to > at {
             fields.insert(i + 1, (f, at + (to - at) - 1, at));
